@@ -1,0 +1,56 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>English Masters · Round 1</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@800;900&display=swap">
+<style>
+:root{--gold:#ffc93c;--gold2:#e39a14;--ink:#0a1638;--cream:#fff3c4;--red:#ff5a50;--green:#3be07a}
+html,body{height:100%;margin:0}
+body{background:#060f33 url(../a/bg.webp) center/cover no-repeat;color:var(--cream);font-family:'Nunito',Arial,sans-serif;overflow:hidden;user-select:none;cursor:pointer}
+.wrap{position:absolute;inset:0 26% 0 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.6vh;padding:0 16px}
+.logo{position:absolute;left:2vw;top:2vh;width:7vw;min-width:56px}
+.pill{background:var(--ink);border:2px solid var(--gold);color:var(--gold);border-radius:99px;padding:.5vh 2vw;font-weight:900;letter-spacing:.15em;font-size:clamp(11px,1.3vw,18px)}
+h1{margin:0;font-family:'Lilita One',Impact,sans-serif;font-weight:400;font-size:clamp(40px,7vw,110px);color:var(--gold);text-shadow:0 6px 0 #7a4a00,0 0 40px #ffb000aa;line-height:1}
+.round{font-family:'Lilita One',Impact,sans-serif;font-size:clamp(28px,4vw,60px);background:linear-gradient(180deg,var(--gold),var(--gold2));color:var(--ink);border-radius:99px;padding:.4vh 3vw;letter-spacing:.08em;box-shadow:inset 0 4px 8px #fff8,0 6px 14px #0008}
+.sub{font-weight:800;font-style:italic;font-size:clamp(14px,1.6vw,24px)}
+.time{font-family:'Lilita One',Impact,sans-serif;font-size:clamp(90px,15vw,230px);line-height:1;color:var(--gold);background:var(--ink);border:4px solid var(--gold);border-radius:30px;padding:1vh 3vw;font-variant-numeric:tabular-nums;text-shadow:0 0 30px #ffb00088;box-shadow:0 10px 30px #000a}
+.time.warn{color:var(--red);border-color:var(--red);animation:p .5s infinite alternate}
+@keyframes p{to{transform:scale(1.05)}}
+.bar{width:min(820px,90%);height:3vh;border-radius:99px;background:#0d2160;border:2px solid var(--cream);overflow:hidden}
+.bar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--gold2),var(--gold));transition:width .25s linear}
+.bar.warn i{background:var(--red)}
+.status{font-family:'Lilita One',Impact,sans-serif;font-size:clamp(26px,3.6vw,56px);min-height:1.2em;text-align:center}
+.btns{display:flex;gap:12px}
+button{font:900 clamp(14px,1.4vw,20px) 'Nunito',Arial;border:0;border-radius:14px;padding:1.2vh 2vw;cursor:pointer;background:linear-gradient(180deg,var(--gold),var(--gold2));color:var(--ink);box-shadow:inset 0 3px 6px #fff8,0 5px 12px #0008}
+button.g{background:#ffffff18;color:var(--cream);box-shadow:inset 0 0 0 2px #ffc93c88}
+.girl{position:absolute;right:2vw;bottom:0;height:92vh}
+@media (max-width:800px){.wrap{inset:0}.girl{display:none}}
+</style></head><body>
+<img class="logo" src="../a/logo.webp" alt="Admire Academy">
+<div class="wrap">
+ <div class="pill">ADMIRE ACADEMY PRESENTS</div>
+ <h1>ENGLISH MASTERS</h1>
+ <div class="round">ROUND 1</div>
+ <div class="sub">Paper Challenge · Solve the questions in 2 minutes</div>
+ <div class="time" id="t">2:00</div>
+ <div class="bar" id="bar"><i id="fill"></i></div>
+ <div class="status" id="st">Papers face down… click to START!</div>
+ <div class="btns"><button id="go">▶ START</button><button class="g" id="rs">↺ Reset</button><button class="g" id="fs">⛶ Full screen</button></div>
+</div>
+<img class="girl" src="../a/girl_anim.gif" alt="">
+<audio id="snd" src="timer.mp3" preload="auto"></audio>
+<script>
+const D=120,t=document.getElementById('t'),fill=document.getElementById('fill'),bar=document.getElementById('bar'),st=document.getElementById('st'),go=document.getElementById('go'),snd=document.getElementById('snd');
+let start=0,elapsed=0,run=false,raf;
+const fmt=s=>{s=Math.max(0,Math.ceil(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+function draw(){const left=D-elapsed;t.textContent=fmt(left);fill.style.width=(left/D*100)+'%';const w=left<=10&&left>0;t.classList.toggle('warn',w||left<=0);bar.classList.toggle('warn',w||left<=0)}
+function loop(){elapsed=(performance.now()-start)/1000;if(elapsed>=D){elapsed=D;run=false;draw();st.textContent="TIME'S UP! PENS DOWN!";st.style.color='var(--red)';go.textContent='▶ START';return}draw();raf=requestAnimationFrame(loop)}
+function begin(){if(elapsed>=D)reset();run=true;start=performance.now()-elapsed*1000;try{snd.currentTime=elapsed;snd.play()}catch(e){}st.textContent='OPEN YOUR PAPERS!';st.style.color='var(--green)';go.textContent='❚❚ Pause';loop()}
+function pause(){run=false;cancelAnimationFrame(raf);snd.pause();go.textContent='▶ Resume';st.textContent='Paused';st.style.color='var(--cream)'}
+function reset(){run=false;cancelAnimationFrame(raf);snd.pause();elapsed=0;draw();go.textContent='▶ START';st.textContent='Papers face down… click to START!';st.style.color='var(--cream)'}
+const toggle=()=>run?pause():begin();
+go.onclick=e=>{e.stopPropagation();toggle()};
+document.getElementById('rs').onclick=e=>{e.stopPropagation();reset()};
+document.getElementById('fs').onclick=e=>{e.stopPropagation();try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}catch(x){}};
+document.body.onclick=()=>{if(!run&&elapsed===0)begin()};
+document.onkeydown=e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();toggle()}if(e.key==='r'||e.key==='R')reset()};
+draw();
+</script></body></html>
